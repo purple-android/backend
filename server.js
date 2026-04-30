@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 const dns = require('dns');
 const cors = require('cors');
 
-const notesRoutes = require('./routes/notes');
 const userRoutes = require('./routes/user');
 
 // express app
@@ -22,7 +21,6 @@ app.use((req, res, next) => {
 });
 
 // routes
-app.use('/api/notes', notesRoutes);
 app.use('/api/user', userRoutes);
 app.get('/', (req, res) => {
   res.json({
