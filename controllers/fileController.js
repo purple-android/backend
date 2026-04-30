@@ -1,6 +1,7 @@
 const File = require('../models/fileModel')
 const path = require('path')
 const fs = require('fs')
+const crypto = require('crypto')
 
 const MAX_FILES = 50
 
@@ -19,6 +20,7 @@ const getFiles = async (req, res) => {
   res.status(200).json(files)
 }
 
+// Save a newly uploaded file's info to the database
 const uploadFile = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'Please select a file to upload' })
@@ -27,24 +29,30 @@ const uploadFile = async (req, res) => {
   try {
     const user_id = req.user._id
 
+    const fileBuffer = fs.readFileSync(req.file.path)
+    const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex')
+
     const fileCount = await File.countDocuments({ user_id })
     if (fileCount >= MAX_FILES) {
       deleteFromDisk(req.file.filename)
       return res.status(400).json({ error: `You have reached the maximum limit of ${MAX_FILES} files` })
     }
 
-    const duplicate = await File.findOne({ user_id, originalName: req.file.originalname })
+    const duplicate = await File.findOne({ user_id, hash })
     if (duplicate) {
       deleteFromDisk(req.file.filename)
-      return res.status(400).json({ error: `You already have a file named "${req.file.originalname}"` })
+      return res.status(400).json({
+        error: `You already uploaded this file (as "${duplicate.originalName}")`
+      })
     }
 
     const file = await File.create({
-      originalName: req.file.originalname, // original filename from user's computer
-      filename: req.file.filename,         // unique filename we saved it as on disk
-      mimetype: req.file.mimetype,         // file type (e.g. "image/jpeg")
-      size: req.file.size,                 // file size in bytes
-      user_id                              // which user uploaded it
+      originalName: req.file.originalname,
+      filename: req.file.filename,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      hash,
+      user_id
     })
 
     res.status(200).json(file)

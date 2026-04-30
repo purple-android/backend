@@ -1,6 +1,7 @@
 const express = require('express')
 const multer = require('multer')
 const path = require('path')
+const fs = require('fs')
 const { getFiles, uploadFile, deleteFile } = require('../controllers/fileController')
 const requireAuth = require('../middleware/requireAuth')
 
@@ -8,7 +9,9 @@ const router = express.Router()
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '..', 'uploads'))
+    const uploadsPath = path.join(__dirname, '..', 'uploads')
+    fs.mkdirSync(uploadsPath, { recursive: true })
+    cb(null, uploadsPath)
   },
   filename: function (req, file, cb) {
     const uniqueName = Date.now() + '-' + file.originalname
@@ -19,6 +22,7 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase()
 
+  // List of allowed file extensions
   const allowedExtensions = [
     // Documents
     '.pdf', '.doc', '.docx', '.txt',
