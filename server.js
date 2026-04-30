@@ -24,6 +24,11 @@ app.use((req, res, next) => {
 // routes
 app.use('/api/notes', notesRoutes);
 app.use('/api/user', userRoutes);
+app.get('/', (req, res) => {
+  res.json({
+    message: "Backend is running"
+  })
+});
 
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
