@@ -4,37 +4,37 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dns = require('dns');
 const cors = require('cors');
+const path = require('path');
 
 const userRoutes = require('./routes/user');
+const fileRoutes = require('./routes/files');
 
-// express app
 const app = express();
 
-// middleware
 app.use(cors());
+
 app.use(express.json());
 
-// Logging Middleware
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 
-// routes
+app.use('/api/files', fileRoutes);
+
 app.use('/api/user', userRoutes);
+
 app.get('/', (req, res) => {
-  res.json({
-    message: "Backend is running"
-  })
+  res.json({ message: "Backend is running" });
 });
 
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
-// connect to db
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to database');
-
     app.listen(process.env.PORT, () => {
       console.log('Listening for requests on port', process.env.PORT);
     });
