@@ -22,32 +22,19 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase()
 
-  // List of allowed file extensions
-  const allowedExtensions = [
-    // Documents
-    '.pdf', '.doc', '.docx', '.txt',
-    // Images
-    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg',
-    // Videos
-    '.mp4', '.mov', '.avi', '.webm', '.mkv'
-  ]
+  const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt']
 
   const allowedTypes = [
-    // Documents
     'application/pdf',
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/plain',
-    // Images — image/* covers all image types
-    'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml',
-    // Videos
-    'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/webm', 'video/x-matroska'
+    'text/plain'
   ]
 
   if (allowedExtensions.includes(ext) || allowedTypes.includes(file.mimetype)) {
     cb(null, true)
   } else {
-    cb(new Error('File type not allowed. Use images, videos, .pdf, .doc, .docx, or .txt'), false)
+    cb(new Error('Only .pdf, .doc, .docx and .txt files are allowed'), false)
   }
 }
 
