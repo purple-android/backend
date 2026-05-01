@@ -6,7 +6,8 @@ const fileSchema = new mongoose.Schema({
   mimetype: { type: String, required: true },
   size: { type: Number, required: true },
   user_id: { type: String, required: true },
-  hash: { type: String, required: true }
+  hash: { type: String, required: true },
+  thumbnailFilename: { type: String, default: null }
 }, { timestamps: true })
 
 module.exports = mongoose.model('File', fileSchema)

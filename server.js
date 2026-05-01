@@ -16,6 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/thumbnails', express.static(path.join(__dirname, 'thumbnails')));
+
 
 app.use((req, res, next) => {
   console.log(req.path, req.method);

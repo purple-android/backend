@@ -2,6 +2,7 @@ const File = require('../models/fileModel')
 const path = require('path')
 const fs = require('fs')
 const crypto = require('crypto')
+const { generateThumbnail, deleteThumbnail } = require('../utils/generateThumbnail')
 
 const MAX_FILES = 50
 
@@ -46,12 +47,15 @@ const uploadFile = async (req, res) => {
       })
     }
 
+    const thumbnailFilename = await generateThumbnail(req.file.path, req.file.mimetype, req.file.filename)
+
     const file = await File.create({
       originalName: req.file.originalname,
       filename: req.file.filename,
       mimetype: req.file.mimetype,
       size: req.file.size,
       hash,
+      thumbnailFilename: thumbnailFilename || null,
       user_id
     })
 
@@ -71,6 +75,7 @@ const deleteFile = async (req, res) => {
   }
 
   deleteFromDisk(file.filename)
+  deleteThumbnail(file.thumbnailFilename)
 
   res.status(200).json(file)
 }
